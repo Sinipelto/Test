@@ -53,12 +53,15 @@ jobs:
         run: |
           ls -la
           VERSION=$(cat version)
+          echo 1: $VERSION 2: ${ VERSION }
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
       - name: Create Release jars
-        run: ./gradlew jar
+        run: |
+          ./gradlew jar
+          mv -v $BUILD_DIR/libs/*.jar ${appname}-${version}.jar
 
       - name: "Create release in GitHub"
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -69,8 +72,9 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            LICENSE
-            *.jar
+            Readme.txt
+            version
+            ${appname}-${version}.jar
 
       - name: Upload Release artifacts
         uses: actions/upload-artifact@v4
