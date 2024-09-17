@@ -120,11 +120,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # - name: Collect version
-      #   run: |
-      #     ls -la
-      #     VERSION=$(cat version)
-      #     echo 1: $VERSION 2: ${VERSION}
+      - name: Collect version
+        run: |
+          echo $VERSION=$(cat version) >> $GITHUB_ENV
 
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
