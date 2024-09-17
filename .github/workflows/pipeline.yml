@@ -33,8 +33,12 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
+          cache: 'gradle'
           java-version: '11'
           distribution: 'temurin'
+          cache-dependency-path: |
+            **/*.gradle*
+            **/gradle-wrapper.properties
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
@@ -48,6 +52,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'gradle'
+          cache-dependency-path: |
+            **/*.gradle*
+            **/gradle-wrapper.properties
 
       - name: Collect version
         run: |
@@ -80,14 +93,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${ appname }-${ VERSION }
-          path: |
-            ./build/libs/client-${ VERSION }.jar
-            ./build/libs/server-${ VERSION }.jar
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
           overwrite: true
           include-hidden-files: false
+          path: |
+            version
+            Readme.txt
+            ${appname}-${version}.jar
 
   deploy:
     runs-on: ubuntu-latest
