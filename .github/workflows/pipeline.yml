@@ -20,8 +20,8 @@ on:
 #  release:
 #    types: [created]
 env:
-  APPNAME: 'test-app'
-  BUILD_DIR: 'build'
+  APP_NAME: 'test-app'
+  BUILD_DIR: 'client/build/libs'
   ARTIFACT_DIR: 'artifacts'
 
 jobs:
@@ -76,7 +76,7 @@ jobs:
       - name: Create Release jars
         run: |
           ./gradlew jar
-          mv -v $BUILD_DIR/libs/*.jar ${appname}-${version}.jar
+          mv -v ${BUILD_DIR}/*.jar ${APP_NAME}-${VERSION}.jar
 
       - name: "Create release in GitHub"
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -87,14 +87,14 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            Readme.txt
             version
-            ${appname}-${version}.jar
+            Readme.txt
+            ${APP_NAME}-${VERSION}.jar
 
       - name: Upload Release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${APPNAME}-${VERSION}
+          name: ${APP_NAME}-${VERSION}
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
@@ -103,33 +103,55 @@ jobs:
           path: |
             version
             Readme.txt
-            ${appname}-${version}.jar
+            ${APP_NAME}-${VERSION}.jar
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs:
+      - build
+      - release
 
     environment:
       name: 'production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
+      - uses: actions/checkout@v4
+
+      # - name: Collect version
+      #   run: |
+      #     ls -la
+      #     VERSION=$(cat version)
+      #     echo 1: $VERSION 2: ${VERSION}
+
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: ${APPNAME}-${VERSION}
+          name: ${APP_NAME}-${VERSION}
 
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'gradle'
+          cache-dependency-path: |
+            **/*.gradle*
+            **/gradle-wrapper.properties
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+    
       - name: Deploy release to Maven and GitHub repositories
         run: ./gradlew publish
         env: 
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          # MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          # MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@85270a1854658d167ab239bce43949edb336fa7c
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: '*.jar'
+      # - name: Deploy to Azure Web App
+      #   id: deploy-to-webapp
+      #   uses: azure/webapps-deploy@85270a1854658d167ab239bce43949edb336fa7c
+      #   with:
+      #     app-name: ${{ env.AZURE_WEBAPP_NAME }}
+      #     publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+      #     package: '*.jar'
