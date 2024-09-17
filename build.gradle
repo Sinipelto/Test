@@ -8,8 +8,6 @@ publishing {
             groupId = 'com.rt4.client'
             artifactId = 'library'
             version = '0.0.4'
-
-            from components.java
         }
     }
     repositories {
