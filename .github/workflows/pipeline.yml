@@ -20,9 +20,13 @@ on:
 #  release:
 #    types: [created]
 env:
+  # VERSION FROM FILE
   APP_NAME: 'test-app'
   BUILD_DIR: 'client/build/libs'
   ARTIFACT_DIR: 'artifacts'
+  # MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+  # MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build:
@@ -66,9 +70,7 @@ jobs:
 
       - name: Collect version
         run: |
-          ls -la
-          VERSION=$(cat version)
-          echo 1: $VERSION 2: ${VERSION}
+          echo $VERSION=$(cat version) >> $GITHUB_ENV
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
@@ -143,15 +145,3 @@ jobs:
     
       - name: Deploy release to Maven and GitHub repositories
         run: ./gradlew publish
-        env: 
-          # MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          # MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # - name: Deploy to Azure Web App
-      #   id: deploy-to-webapp
-      #   uses: azure/webapps-deploy@85270a1854658d167ab239bce43949edb336fa7c
-      #   with:
-      #     app-name: ${{ env.AZURE_WEBAPP_NAME }}
-      #     publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-      #     package: '*.jar'
