@@ -23,6 +23,7 @@ env:
   # VERSION FROM FILE
   APP_NAME: 'test-app'
   BUILD_DIR: 'client/build/libs'
+  LOCAL_REPO: 'repodir'
   # MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
   # MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -142,5 +143,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
     
+      - name: Create local repo dir
+        run: |
+          mkdir -p ${{ env.REPO_DIR }}
+          chmod 777 ${{ env.REPO_DIR }}
+
       - name: Deploy release to Maven and GitHub repositories
         run: ./gradlew publish
