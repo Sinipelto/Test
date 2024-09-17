@@ -23,7 +23,7 @@ env:
   # VERSION FROM FILE
   APP_NAME: 'test-app'
   BUILD_DIR: 'client/build/libs'
-  LOCAL_REPO: 'repodir'
+  REPO_DIR: 'repodir'
   # MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
   # MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
