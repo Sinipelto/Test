@@ -19,6 +19,8 @@ on:
       - release
 #  release:
 #    types: [created]
+env:
+  appname: 'test-app'
 
 jobs:
   build:
@@ -45,6 +47,9 @@ jobs:
     needs: build
 
     steps:
+      - name: Collect version
+        run: VERSION = $(cat version)
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
@@ -54,9 +59,9 @@ jobs:
       - name: "Create release in GitHub"
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          title: "Automatic Release ${{ version }}"
+          title: "Automatic Release ${{ VERSION }}"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ version }}"
+          automatic_release_tag: "${{ VERSION }}"
           draft: false
           prerelease: false
           files: |
@@ -66,10 +71,10 @@ jobs:
       - name: Upload Release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ appname }}-${{ version }}
+          name: ${{ appname }}-${{ VERSION }}
           path: |
-            ./build/libs/client-${{ version }}.jar
-            ./build/libs/server-${{ version }}.jar
+            ./build/libs/client-${{ VERSION }}.jar
+            ./build/libs/server-${{ VERSION }}.jar
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
@@ -88,7 +93,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: ${{ appname }}-${{ version }}
+          name: ${{ appname }}-${{ VERSION }}
 
       - name: Deploy release to Maven and GitHub repositories
         run: ./gradlew publish
