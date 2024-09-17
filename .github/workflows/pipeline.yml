@@ -59,9 +59,9 @@ jobs:
       - name: "Create release in GitHub"
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          title: "Automatic Release ${{ VERSION }}"
+          title: "Automatic Release ${ VERSION }"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ VERSION }}"
+          automatic_release_tag: "${ VERSION }"
           draft: false
           prerelease: false
           files: |
@@ -71,10 +71,10 @@ jobs:
       - name: Upload Release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ appname }}-${{ VERSION }}
+          name: ${ appname }-${ VERSION }
           path: |
-            ./build/libs/client-${{ VERSION }}.jar
-            ./build/libs/server-${{ VERSION }}.jar
+            ./build/libs/client-${ VERSION }.jar
+            ./build/libs/server-${ VERSION }.jar
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
@@ -93,7 +93,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: ${{ appname }}-${{ VERSION }}
+          name: ${ appname }-${ VERSION }
 
       - name: Deploy release to Maven and GitHub repositories
         run: ./gradlew publish
