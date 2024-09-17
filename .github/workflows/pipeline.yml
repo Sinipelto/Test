@@ -20,7 +20,9 @@ on:
 #  release:
 #    types: [created]
 env:
-  appname: 'test-app'
+  APPNAME: 'test-app'
+  BUILD_DIR: 'build'
+  ARTIFACT_DIR: 'artifacts'
 
 jobs:
   build:
@@ -66,7 +68,7 @@ jobs:
         run: |
           ls -la
           VERSION=$(cat version)
-          echo 1: $VERSION 2: ${ VERSION }
+          echo 1: $VERSION 2: ${VERSION}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
@@ -79,9 +81,9 @@ jobs:
       - name: "Create release in GitHub"
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          title: "Automatic Release ${ VERSION }"
+          title: "Automatic Release ${VERSION}"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${ VERSION }"
+          automatic_release_tag: "${VERSION}"
           draft: false
           prerelease: false
           files: |
@@ -92,7 +94,7 @@ jobs:
       - name: Upload Release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${ appname }-${ VERSION }
+          name: ${APPNAME}-${VERSION}
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
@@ -115,7 +117,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: ${ appname }-${ VERSION }
+          name: ${APPNAME}-${VERSION}
 
       - name: Deploy release to Maven and GitHub repositories
         run: ./gradlew publish
