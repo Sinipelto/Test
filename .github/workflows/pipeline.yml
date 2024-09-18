@@ -10,7 +10,7 @@
 # https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-java-packages-with-gradle
 # https://github.com/actions/upload-artifact
 
-name: Test CICD Pipeline
+name: Test CICD Pipeline for Build and Release
 
 on:
   push:
