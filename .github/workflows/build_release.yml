@@ -55,7 +55,8 @@ jobs:
     permissions:
       contents: read
 
-    needs: build
+    needs:
+      - build
     
     steps:
 
@@ -76,7 +77,8 @@ jobs:
       - name: Run tests with Gradle
         run: ./gradlew test
 
-
+# TODO: ON SEPARATE WORKFLOW
+# PLUS ADD DEPENDENCY ON BUILD_TEST
   release:
     runs-on: ubuntu-latest
 
@@ -84,7 +86,9 @@ jobs:
       contents: write
       packages: write
 
-    needs: build
+    needs:
+      - build
+      - test
 
     steps:
       - uses: actions/checkout@v4
