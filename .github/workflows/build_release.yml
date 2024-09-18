@@ -102,11 +102,20 @@ jobs:
             **/*.gradle*
             **/gradle-wrapper.properties
 
+      - name: Bump version
+        run: |
+          ver=$(cat version)
+          ver2=$(echo $ver | awk '{print $1"."$2"."($3+1)}')
+          echo $ver2 > version
+          git add version
+          git commit -m "Automatic Bump Version from ${ver} to ${ver2}."
+          git push
+
       - name: Collect version
         run: |
           ver=$(cat version)
           echo "VERSION=$ver" >> $GITHUB_ENV
-
+          
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
