@@ -152,8 +152,9 @@ jobs:
             Readme.txt
             ${{ env.APP_NAME }}-${{ env.VERSION }}.jar
 
-      - name: Commit and Push New Version
+      - name: Update Commit And Push New Version
         run: |
+          echo ${{ env.VERSION }} > version
           git add version
           git commit -m "Automatic Bump Version from ${{ env.VERSION_OLD }} to ${{ env.VERSION }}."
           git push
@@ -164,6 +165,11 @@ jobs:
     permissions:
      contents: read
      deployments: write
+
+    needs:
+      - build
+      - test
+      - release
 
     environment:
       name: 'production'
