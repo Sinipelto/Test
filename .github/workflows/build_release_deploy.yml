@@ -178,10 +178,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Collect version
+      - name: Bump and collect version
         run: |
+          chmod +x version.sh
           ver=$(cat version)
-          echo "VERSION=$ver" >> $GITHUB_ENV
+          ver2=$(./version.sh $ver)
+          echo "VERSION_OLD=$ver" >> $GITHUB_ENV
+          echo "VERSION=$ver2" >> $GITHUB_ENV
 
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
