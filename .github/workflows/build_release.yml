@@ -103,6 +103,7 @@ jobs:
 
       - name: Bump and collect version
         run: |
+          chmod +x version.sh
           ver=$(cat version)
           ver2=$(./version.sh $ver)
           echo "VERSION_OLD=$ver" >> $GITHUB_ENV
