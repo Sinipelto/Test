@@ -2,6 +2,16 @@ plugins {
     id 'maven-publish'
 }
 
+tasks.withType(Test) {
+    useJunitPlatform()
+    testLogging {
+        exceptionFormat "full"
+        events "started", "skipped", "passed", "failed"
+        showStandardStreams true
+    }
+    include '**/test/*'
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
@@ -12,8 +22,5 @@ publishing {
     }
     repositories {
 		mavenLocal()
-        // maven {
-        //     url = uri("file://./repo")
-        // }
 	}
 }

@@ -11,4 +11,11 @@ targetCompatibility = 1.8
 dependencies {
     compileOnly project(':deob-annotations')
     compileOnly 'lib:jogl-all'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    testCompileOnly 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.8.1'
+    testCompileOnly 'junit:junit:4.12'
 }
