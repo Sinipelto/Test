@@ -16,8 +16,11 @@ on:
   push:
     paths-ignore:
       - '**/*.md'
+      - '**/*.MD'
       - '**/*.txt'
+      - '**/*.TXT'
       - 'version'
+      - 'version.sh'
     branches:
       - master
       - release
@@ -47,8 +50,7 @@ jobs:
             **/*.gradle*
             **/gradle-wrapper.properties
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
       - name: Build with Gradle
         run: ./gradlew build
@@ -75,14 +77,11 @@ jobs:
             **/*.gradle*
             **/gradle-wrapper.properties
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
       - name: Run tests with Gradle
         run: ./gradlew test
 
-# TODO: ON SEPARATE WORKFLOW
-# PLUS ADD DEPENDENCY ON BUILD_TEST
   release:
     runs-on: ubuntu-latest
 
@@ -102,19 +101,12 @@ jobs:
           git config user.name "DevOps"
           git config user.email "devops@company.com"
 
-      - name: Bump version
+      - name: Bump and collect version
         run: |
           ver=$(cat version)
-          ver2=$(echo $ver | awk '{print $1"."$2"."($3+1)}')
-          echo $ver2 > version
-          git add version
-          git commit -m "Automatic Bump Version from ${ver} to ${ver2}."
-          git push
-
-      - name: Collect version
-        run: |
-          ver=$(cat version)
-          echo "VERSION=$ver" >> $GITHUB_ENV
+          ver2=$(./version.sh $ver)
+          echo "VERSION_OLD=$ver" >> $GITHUB_ENV
+          echo "VERSION=$ver2" >> $GITHUB_ENV
 
       - uses: actions/setup-java@v4
         with:
@@ -124,16 +116,15 @@ jobs:
           cache-dependency-path: |
             **/*.gradle*
             **/gradle-wrapper.properties
-          
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
-      - name: Create Release jars
+      - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+
+      - name: Create Release Jar
         run: |
           ./gradlew jar
           mv -v ${{ env.BUILD_DIR}}/*.jar ${{ env.APP_NAME }}-${{ env.VERSION }}.jar
 
-      - name: "Create release in GitHub"
+      - name: Create Release in GitHub
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           title: "Automatic Release ${{ env.VERSION }}"
@@ -146,7 +137,7 @@ jobs:
             Readme.txt
             ${{ env.APP_NAME }}-${{ env.VERSION }}.jar
 
-      - name: Upload Release artifacts
+      - name: Upload Release Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.APP_NAME }}-${{ env.VERSION }}
@@ -160,3 +151,8 @@ jobs:
             Readme.txt
             ${{ env.APP_NAME }}-${{ env.VERSION }}.jar
 
+      - name: Commit and Push New Version
+        run: |
+          git add version
+          git commit -m "Automatic Bump Version from ${{ env.VERSION_OLD }} to ${{ env.VERSION }}."
+          git push
