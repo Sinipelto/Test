@@ -11,8 +11,9 @@ publishing {
         }
     }
     repositories {
-        maven {
-            url = uri("file://./repo")
-        }
+		mavenLocal()
+        // maven {
+        //     url = uri("file://./repo")
+        // }
 	}
 }
