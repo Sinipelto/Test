@@ -1,3 +1,8 @@
+# Test Repo
+
+[![pipeline status](https://gitlab.com/Sinipelto/cicd-test/badges/main/pipeline.svg)](https://gitlab.com/Sinipelto/cicd-test/-/commits/main)
+[![Latest Release](https://gitlab.com/Sinipelto/cicd-test/-/badges/release.svg)](https://gitlab.com/Sinipelto/cicd-test/-/releases)
+
 ## Goals
 
 * Identify all classes
