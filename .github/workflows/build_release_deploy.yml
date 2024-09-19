@@ -116,23 +116,23 @@ jobs:
 
       - run: |
           ./gradlew jar
-          mv -v ${{ vars.BUILD_DIR}}/*.jar ${{ vars.APP_NAME }}_${{ vars.VERSION }}.jar
+          mv -v ${{ env.BUILD_DIR}}/*.jar ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          title: "Automatic Release ${{ vars.VERSION }}"
+          title: "Automatic Release ${{ env.VERSION }}"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ vars.VERSION }}"
+          automatic_release_tag: "${{ env.VERSION }}"
           draft: false
           prerelease: false
           files: |
             version
             Readme.txt
-            ${{ vars.APP_NAME }}_${{ vars.VERSION }}.jar
+            ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ vars.APP_NAME }}_${{ vars.VERSION }}
+          name: ${{ env.APP_NAME }}_${{ env.VERSION }}
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
@@ -141,12 +141,12 @@ jobs:
           path: |
             version
             Readme.txt
-            ${{ vars.APP_NAME }}_${{ vars.VERSION }}.jar
+            ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
 
       - run: |
-          echo ${{ vars.VERSION }} > version
+          echo ${{ env.VERSION }} > version
           git add version
-          git commit -m "Automatic Bump Version from ${{ vars.VERSION_OLD }} to ${{ vars.VERSION }}."
+          git commit -m "Automatic Bump Version from ${{ env.VERSION_OLD }} to ${{ env.VERSION }}."
           git push
 
   deploy:
@@ -162,7 +162,7 @@ jobs:
       - release
 
     environment:
-      name: ${{ vars.ENVIRONMENT }}
+      name: ${{ env.ENVIRONMENT }}
 
     steps:
       - uses: actions/checkout@v4
@@ -175,7 +175,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: ${{ vars.APP_NAME }}_${{ vars.VERSION }}
+          name: ${{ env.APP_NAME }}_${{ env.VERSION }}
 
       - uses: actions/setup-java@v4
         with:
