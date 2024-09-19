@@ -16,9 +16,7 @@ on:
   push:
     paths-ignore:
       - '**/*.md'
-      - '**/*.MD'
       - '**/*.txt'
-      - '**/*.TXT'
       - 'version'
       - 'version.sh'
     branches:
@@ -29,7 +27,6 @@ env:
   # VERSION FROM FILE
   APP_NAME: 'test-app'
   BUILD_DIR: 'client/build/libs'
-  REPO_DIR: 'repodir'
 
 jobs:
   build:
@@ -40,8 +37,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Build with Gradle
-        run: ./gradlew build
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'gradle'
+          cache-dependency-path: |
+            **/*.gradle*
+            **/gradle-wrapper.properties
+
+      - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+
+      - run: ./gradlew build
 
   test:
     runs-on: ubuntu-latest
@@ -53,22 +61,20 @@ jobs:
       - build
     
     steps:
-
       - uses: actions/checkout@v4
 
       - uses: actions/setup-java@v4
         with:
-          cache: 'gradle'
           java-version: '11'
           distribution: 'temurin'
+          cache: 'gradle'
           cache-dependency-path: |
             **/*.gradle*
             **/gradle-wrapper.properties
 
       - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
-      - name: Run tests with Gradle
-        run: ./gradlew test
+      - run: ./gradlew test
 
   release:
     runs-on: ubuntu-latest
@@ -86,11 +92,10 @@ jobs:
 
       - name: Configure Git
         run: |
-          git config user.name "DevOps"
+          git config user.name "DevOps User"
           git config user.email "devops@company.com"
 
-      - name: Bump and collect version
-        run: |
+      - run: |
           chmod +x version.sh
           ver=$(cat version)
           ver2=$(./version.sh $ver)
@@ -108,13 +113,11 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
-      - name: Create Release Jar
-        run: |
+      - run: |
           ./gradlew jar
-          mv -v ${{ env.BUILD_DIR}}/*.jar ${{ env.APP_NAME }}-${{ env.VERSION }}.jar
+          mv -v ${{ env.BUILD_DIR}}/*.jar ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
 
-      - name: Create Release in GitHub
-        uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           title: "Automatic Release ${{ env.VERSION }}"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
@@ -124,12 +127,11 @@ jobs:
           files: |
             version
             Readme.txt
-            ${{ env.APP_NAME }}-${{ env.VERSION }}.jar
+            ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
 
-      - name: Upload Release Artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.VERSION }}
+          name: ${{ env.APP_NAME }}_${{ env.VERSION }}
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
@@ -138,10 +140,9 @@ jobs:
           path: |
             version
             Readme.txt
-            ${{ env.APP_NAME }}-${{ env.VERSION }}.jar
+            ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
 
-      - name: Update Commit And Push New Version
-        run: |
+      - run: |
           echo ${{ env.VERSION }} > version
           git add version
           git commit -m "Automatic Bump Version from ${{ env.VERSION_OLD }} to ${{ env.VERSION }}."
@@ -160,24 +161,20 @@ jobs:
       - release
 
     environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+      name: 'Production'
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Bump and collect version
-        run: |
-          chmod +x version.sh
-          ver=$(cat version)
-          ver2=$(./version.sh $ver)
-          echo "VERSION_OLD=$ver" >> $GITHUB_ENV
-          echo "VERSION=$ver2" >> $GITHUB_ENV
-
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.VERSION }}
+          ref: ${{ github.ref }}
+
+      - run: |
+          ver=$(cat version)
+          echo "VERSION=$ver" >> $GITHUB_ENV
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}_${{ env.VERSION }}
 
       - uses: actions/setup-java@v4
         with:
@@ -190,5 +187,4 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
-      - name: Deploy release to configured Maven repository
-        run: ./gradlew publish
+      - run: ./gradlew publish
