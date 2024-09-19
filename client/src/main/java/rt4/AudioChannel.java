@@ -75,16 +75,16 @@ public class AudioChannel {
 	}
 
 	@OriginalMember(owner = "client!id", name = "a", descriptor = "(ILsignlink!ll;Ljava/awt/Component;II)Lclient!vh;")
-	public static AudioChannel create(@OriginalArg(0) int arg0, @OriginalArg(1) SignLink arg1, @OriginalArg(2) Component arg2, @OriginalArg(3) int arg3) {
+	public static AudioChannel create(@OriginalArg(0) int sampleRate, @OriginalArg(1) SignLink arg1, @OriginalArg(2) Component arg2, @OriginalArg(3) int arg3) {
 		if (sampleRate == 0) {
 			throw new IllegalStateException();
 		}
 		try {
 			@Pc(33) AudioChannel audioChannel = new JavaAudioChannel();
-			audioChannel.sampleRate2 = arg0;
+			audioChannel.sampleRate2 = sampleRate;
 			audioChannel.samples = new int[(stereo ? 2 : 1) * 256];
 			audioChannel.init(arg2);
-			audioChannel.bufferCapacity = (arg0 & -1024) + 1024;
+			audioChannel.bufferCapacity = (sampleRate & -1024) + 1024;
 			if (audioChannel.bufferCapacity > 16384) {
 				audioChannel.bufferCapacity = 16384;
 			}
@@ -106,7 +106,7 @@ public class AudioChannel {
 			try {
 				@Pc(120) SignLinkAudioChannel local120 = new SignLinkAudioChannel(arg1, arg3);
 				local120.samples = new int[(stereo ? 2 : 1) * 256];
-				local120.sampleRate2 = arg0;
+				local120.sampleRate2 = sampleRate;
 				local120.init(arg2);
 				local120.bufferCapacity = 16384;
 				local120.open(local120.bufferCapacity);
