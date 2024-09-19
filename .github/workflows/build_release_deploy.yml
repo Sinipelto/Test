@@ -161,8 +161,11 @@ jobs:
       - test
       - release
 
+    # Publish to production environment
+    # TODO: how to parameterize this? cannot acccess env.* only vars.*
     environment:
-      name: ${{ env.ENVIRONMENT }}
+      name: Production
+      url: ${{ github.repositoryUrl }}
 
     steps:
       - uses: actions/checkout@v4
