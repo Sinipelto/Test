@@ -5,9 +5,58 @@
 # Container Scanning customization: https://docs.gitlab.com/ee/user/application_security/container_scanning/#customizing-the-container-scanning-settings
 # Note that environment variables can be set in several places
 # See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
+
+image: eclipse-temurin:8u422-b05-jdk
+
 stages:
+- build
 - test
-sast:
-  stage: test
+- release
+- deploy
+
+variables:
+  APP_NAME: 'test-app'
+  BUILD_DIR: 'client/build/libs'
+  ENVIRONMENT: 'Production'
+
+before_script:
+  - GRADLE_USER_HOME="$(pwd)/.gradle"
+  - export GRADLE_USER_HOME
+
+cache:
+  paths:
+    - '**/*.gradle*'
+    - '**/gradle-wrapper.properties'
+
+build:
+  stage: build
+  script:
+    - ./gradlew build --no-daemon
+
 include:
-- template: Security/SAST.gitlab-ci.yml
+  - template: Security/SAST.gitlab-ci.yml
+
+test:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - ./gradlew test --no-daemon
+
+release:
+  stage: release
+  dependencies:
+    - build
+    - test
+  script:
+    - ./gradlew jar --no-daemon
+
+deploy:
+  stage: deploy
+  dependencies:
+    - build
+    - test
+    - release
+  script:
+    - ./gradlew publish --no-daemon
+
