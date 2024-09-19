@@ -10,6 +10,9 @@
 # https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-java-packages-with-gradle
 # https://github.com/actions/upload-artifact
 
+# About setting up gradle
+# https://github.com/gradle/actions/blob/main/setup-gradle/README.md
+
 name: Test CI Pipeline for Build and Release and Deploy
 
 on:
@@ -75,7 +78,7 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
-      - run: ./gradlew test
+      - run: ./gradlew test --no-daemon
 
   release:
     runs-on: ubuntu-latest
@@ -115,7 +118,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
       - run: |
-          ./gradlew jar
+          ./gradlew jar --no-daemon
           mv -v ${{ env.BUILD_DIR}}/*.jar ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
 
       - uses: "marvinpinto/action-automatic-releases@latest"
@@ -191,4 +194,4 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
-      - run: ./gradlew publish
+      - run: ./gradlew publish --no-daemon
