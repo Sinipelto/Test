@@ -67,6 +67,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: AppThreat/sast-scan-action@1.0.2
+        with:
+          type: java,bash,json,credscan,depscan
+
       - uses: actions/setup-java@v4
         with:
           java-version: '8'
@@ -77,10 +81,6 @@ jobs:
             **/gradle-wrapper.properties
 
       - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
-
-      - uses: AppThreat/sast-scan-action@1.0.2
-        with:
-          type: java,bash,json,credscan,depscan
 
       - run: ./gradlew test --no-daemon
 
