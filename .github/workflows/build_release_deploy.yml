@@ -27,6 +27,7 @@ env:
   # VERSION FROM FILE
   APP_NAME: 'test-app'
   BUILD_DIR: 'client/build/libs'
+  ENVIRONMENT: 'Production'
 
 jobs:
   build:
@@ -115,23 +116,23 @@ jobs:
 
       - run: |
           ./gradlew jar
-          mv -v ${{ env.BUILD_DIR}}/*.jar ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
+          mv -v ${{ vars.BUILD_DIR}}/*.jar ${{ vars.APP_NAME }}_${{ vars.VERSION }}.jar
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          title: "Automatic Release ${{ env.VERSION }}"
+          title: "Automatic Release ${{ vars.VERSION }}"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ env.VERSION }}"
+          automatic_release_tag: "${{ vars.VERSION }}"
           draft: false
           prerelease: false
           files: |
             version
             Readme.txt
-            ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
+            ${{ vars.APP_NAME }}_${{ vars.VERSION }}.jar
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}_${{ env.VERSION }}
+          name: ${{ vars.APP_NAME }}_${{ vars.VERSION }}
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
@@ -140,12 +141,12 @@ jobs:
           path: |
             version
             Readme.txt
-            ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
+            ${{ vars.APP_NAME }}_${{ vars.VERSION }}.jar
 
       - run: |
-          echo ${{ env.VERSION }} > version
+          echo ${{ vars.VERSION }} > version
           git add version
-          git commit -m "Automatic Bump Version from ${{ env.VERSION_OLD }} to ${{ env.VERSION }}."
+          git commit -m "Automatic Bump Version from ${{ vars.VERSION_OLD }} to ${{ vars.VERSION }}."
           git push
 
   deploy:
@@ -161,7 +162,7 @@ jobs:
       - release
 
     environment:
-      name: 'Production'
+      name: ${{ vars.ENVIRONMENT }}
 
     steps:
       - uses: actions/checkout@v4
@@ -174,7 +175,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}_${{ env.VERSION }}
+          name: ${{ vars.APP_NAME }}_${{ vars.VERSION }}
 
       - uses: actions/setup-java@v4
         with:
