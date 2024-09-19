@@ -20,8 +20,8 @@ minor=${minor:?}
 rev=${rev:?}
 
 # Bump up version components correspondingly
-((minor >= 99)) && ((rev >= 99)) && { ((major+=1)); ((minor=0)); ((rev=-1)); }
-((rev >= 99)) && { ((minor+=1)); ((rev=0)); true; } || ((rev+=1))
+((minor >= 9)) && ((rev >= 9)) && { ((major+=1)); ((minor=0)); ((rev=-1)); }
+((rev >= 9)) && { ((minor+=1)); ((rev=0)); true; } || ((rev+=1))
 
 # Output new version
 echo "${major}.${minor}.${rev}"
