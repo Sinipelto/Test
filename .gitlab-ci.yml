@@ -87,10 +87,8 @@ release:
     name: "NAME: Automatic Release ${VERSION}"
     tag_name: ${VERSION}
   artifacts:
-    untracked: false
     when: on_success
-    reports:
-      dotenv: build.env
+    untracked: false
     name: ${APP_NAME}_${VERSION}
     access: all
     paths:
