@@ -22,6 +22,7 @@ on:
       - '**/*.txt'
       - 'version'
       - 'version.sh'
+      - '.gitlab-ci.yml'
     branches:
       - master
       - release
