@@ -36,7 +36,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: eclipse-temurin:8u422-b05-jdk
+    container:
+      image: eclipse-temurin:8u422-b05-jdk
 
     permissions:
       contents: read
@@ -44,21 +45,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - uses: actions/cache@v4
         with:
-          java-version: '8'
-          distribution: 'temurin'
-          cache: 'gradle'
-          cache-dependency-path: |
-            **/*.gradle*
-            **/gradle-wrapper.properties
-
-      - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+          path: |
+            '**/*.gradle*'
+            '**/gradle-wrapper.properties'
 
       - run: ./gradlew build --no-daemon
 
   test:
     runs-on: ubuntu-latest
+    container:
+      image: eclipse-temurin:8u422-b05-jdk
 
     permissions:
       contents: read
@@ -69,25 +67,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/cache@v4
+        with:
+          path: |
+            '**/*.gradle*'
+            '**/gradle-wrapper.properties'
+
       - uses: AppThreat/sast-scan-action@1.0.2
         with:
           type: java,bash,json,credscan,depscan
-
-      - uses: actions/setup-java@v4
-        with:
-          java-version: '8'
-          distribution: 'temurin'
-          cache: 'gradle'
-          cache-dependency-path: |
-            **/*.gradle*
-            **/gradle-wrapper.properties
-
-      - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
       - run: ./gradlew test --no-daemon
 
   release:
     runs-on: ubuntu-latest
+    container:
+      image: eclipse-temurin:8u422-b05-jdk
 
     permissions:
       contents: write
@@ -98,33 +93,30 @@ jobs:
       - test
 
     steps:
+      # NOTE: INSTALLS GIT IF MISSING IN THE CONTAINER IMAGE!!
+      # COMPARE GITLAB: HAS TO BE MANUALLY INSTALLED IN THE IMAGE
       - uses: actions/checkout@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            '**/*.gradle*'
+            '**/gradle-wrapper.properties'
 
       - run: |
           git config user.name "DevOps User"
           git config user.email "devops@company.com"
-
-      - run: |
           chmod +x version.sh
           ver=$(cat version)
           ver2=$(./version.sh $ver)
           echo "VERSION_OLD=$ver" >> $GITHUB_ENV
           echo "VERSION=$ver2" >> $GITHUB_ENV
-
-      - uses: actions/setup-java@v4
-        with:
-          java-version: '8'
-          distribution: 'temurin'
-          cache: 'gradle'
-          cache-dependency-path: |
-            **/*.gradle*
-            **/gradle-wrapper.properties
-
-      - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
-
-      - run: |
           ./gradlew jar --no-daemon
           mv -v ${{ env.BUILD_DIR}}/*.jar ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
+          echo ${{ env.VERSION }} > version
+          git add version
+          git commit -m "[skip-ci] Automatic Bump Version from ${{ env.VERSION_OLD }} to ${{ env.VERSION }}."
+          git push
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -151,14 +143,10 @@ jobs:
             Readme.txt
             ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
 
-      - run: |
-          echo ${{ env.VERSION }} > version
-          git add version
-          git commit -m "[skip-ci] Automatic Bump Version from ${{ env.VERSION_OLD }} to ${{ env.VERSION }}."
-          git push
-
   deploy:
     runs-on: ubuntu-latest
+    container:
+      image: eclipse-temurin:8u422-b05-jdk
 
     permissions:
      contents: read
@@ -180,6 +168,12 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
+      - uses: actions/cache@v4
+        with:
+          path: |
+            '**/*.gradle*'
+            '**/gradle-wrapper.properties'
+
       - run: |
           ver=$(cat version)
           echo "VERSION=$ver" >> $GITHUB_ENV
@@ -187,16 +181,5 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: ${{ env.APP_NAME }}_${{ env.VERSION }}
-
-      - uses: actions/setup-java@v4
-        with:
-          java-version: '8'
-          distribution: 'temurin'
-          cache: 'gradle'
-          cache-dependency-path: |
-            **/*.gradle*
-            **/gradle-wrapper.properties
-
-      - uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
       - run: ./gradlew publish --no-daemon
