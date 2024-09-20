@@ -1,6 +1,11 @@
 # Test Repo
 
-[![pipeline status](https://gitlab.com/Sinipelto/cicd-test/badges/main/pipeline.svg)](https://gitlab.com/Sinipelto/cicd-test/-/commits/main)
+GitHub:
+![Build, Release & Deploy](https://github.com/sinipelto/test/actions/workflows/build_release_deploy.yml/badge.svg)
+[![Latest Release](https://img.shields.io/github/v/release/sinipelto/test?logo=GitHub)](https://github.com/sinipelto/test/releases)
+
+GitLab:
+[![GitLab status](https://gitlab.com/Sinipelto/cicd-test/badges/main/pipeline.svg)](https://gitlab.com/Sinipelto/cicd-test/-/commits/main)
 [![Latest Release](https://gitlab.com/Sinipelto/cicd-test/-/badges/release.svg)](https://gitlab.com/Sinipelto/cicd-test/-/releases)
 
 ## Goals
