@@ -102,7 +102,7 @@ deploy:
   dependencies:
     - build
     - test
-    - release # pre and post
+    - release_post # pre and post
   environment:
     name: Production
     url: $CI_REPOSITORY_URL
