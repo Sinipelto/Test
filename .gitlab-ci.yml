@@ -9,6 +9,8 @@
 image:
   name: eclipse-temurin:8u422-b05-jdk
 
+# using defaults for every job is preferred
+# instead of using globals, if keyword supported
 default:
   interruptible: true
   before_script:
@@ -58,8 +60,9 @@ release:
     - chmod +x version.sh
     - VERSION_OLD=$(cat version)
     - VERSION=$(./version.sh $VERSION_OLD)
-    - echo "VERSION_OLD=$VERSION_OLD" >> dot.env
-    - echo "VERSION=$VERSION" >> dot.env
+    - echo "VERSION_OLD=$VERSION_OLD" >> ${GITHUB_ENV:build.env}
+    - echo "VERSION=$VERSION" >> ${GITHUB_ENV:build.env}
+    - echo $VERSION > version
     - ./gradlew jar --no-daemon
     - mv -v ${BUILD_DIR}/*.jar ${APP_NAME}_${VERSION}.jar
     - git add version
@@ -74,7 +77,7 @@ release:
     untracked: false
     when: on_success
     reports:
-      dotenv: dot.env
+      dotenv: build.env
     name: ${APP_NAME}_${VERSION}
     access: all
     paths:

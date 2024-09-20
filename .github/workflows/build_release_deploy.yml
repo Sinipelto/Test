@@ -46,6 +46,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
       - uses: actions/cache@v4
         with:
@@ -69,6 +71,8 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
       - uses: actions/cache@v4
         with:
@@ -95,16 +99,16 @@ jobs:
 
     steps:
       - run: |
+          chmod +x version.sh
+          VERSION_OLD=$(cat version)
+          VERSION=$(./version.sh $VERSION_OLD)
+          echo "VERSION_OLD=$VERSION_OLD" >> ${GITHUB_ENV:build.env}
+          echo "VERSION=$VERSION" >> ${GITHUB_ENV:build.env}
+          echo $VERSION > version
           git config user.name "DevOps User"
           git config user.email "devops@company.com"
-          chmod +x version.sh
-          ver=$(cat version)
-          ver2=$(./version.sh $ver)
-          echo "VERSION_OLD=$ver" >> $GITHUB_ENV
-          echo "VERSION=$ver2" >> $GITHUB_ENV
-          echo ${{ env.VERSION }} > version
           git add version
-          git commit -m "[skip-ci] Automatic Bump Version from ${{ env.VERSION_OLD }} to ${{ env.VERSION }}."
+          git commit -m "[skip-ci] Automatic Bump Version from ${VERSION_OLD} to ${VERSION}."
           git push
 
   release:
@@ -125,6 +129,8 @@ jobs:
       # NOTE: INSTALLS GIT IF MISSING IN THE CONTAINER IMAGE!!
       # COMPARE GITLAB: HAS TO BE MANUALLY INSTALLED IN THE IMAGE
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
       - uses: actions/cache@v4
         with:
@@ -179,7 +185,7 @@ jobs:
       - release
 
     # Publish to production environment
-    # TODO: how to parameterize this? cannot acccess env.* only vars.*
+    # TODO: how to parameterize name? cannot acccess env.* only vars.*
     environment:
       name: Production
       url: ${{ github.repositoryUrl }}
@@ -198,10 +204,12 @@ jobs:
 
       - run: |
           ver=$(cat version)
-          echo "VERSION=$ver" >> $GITHUB_ENV
+          echo "VERSION=$ver" >> ${GITHUB_ENV:build.env}
 
       - uses: actions/download-artifact@v4
         with:
           name: ${{ env.APP_NAME }}_${{ env.VERSION }}
+
+      # TODO: PUBLISH PACKAGE TO GITHUB PACKAGES
 
       - run: ./gradlew publish --no-daemon
