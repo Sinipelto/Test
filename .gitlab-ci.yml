@@ -72,7 +72,7 @@ release_pre:
     reports:
       dotenv: build.env
 
-release:
+release_post:
   stage: release
   dependencies:
     - build
@@ -102,7 +102,7 @@ deploy:
   dependencies:
     - build
     - test
-    - release
+    - release # pre and post
   environment:
     name: Production
     url: $CI_REPOSITORY_URL
