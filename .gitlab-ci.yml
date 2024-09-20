@@ -49,7 +49,35 @@ release:
     - build
     - test
   script:
+    - git config user.name "DevOps User"
+    - git config user.email "devops@company.com"
+    - chmod +x version.sh
+    - VERSION_OLD=$(cat version)
+    - VERSION=$(./version.sh $VERSION_OLD)
+    - echo "VERSION_OLD=$VERSION_OLD" >> dot.env
+    - echo "VERSION=$VERSION" >> dot.env
     - ./gradlew jar --no-daemon
+    - mv -v ${BUILD_DIR}/*.jar ${APP_NAME}_${VERSION}.jar
+    - git add version
+    - git commit -m "[skip-ci] Automatic Bump Version from ${VERSION_OLD} to ${VERSION}."
+    - git push
+  release:
+    # Description is REQUIRED
+    description: "DESCRIPTION: Automatic Release ${VERSION}"
+    name: "NAME: Automatic Release ${VERSION}"
+    tag_name: ${VERSION}
+  artifacts:
+    untracked: false
+    when: on_success
+    reports:
+      dotenv: dot.env
+    name: ${APP_NAME}_${VERSION}
+    access: all
+    paths:
+      - version
+      - Readme.txt
+      - ${APP_NAME}_${VERSION}.jar
+    expire_in: "7 days"
 
 deploy:
   stage: deploy
@@ -57,6 +85,11 @@ deploy:
     - build
     - test
     - release
+  environment:
+    name: Production
+    action: start
+    deployment_tier: production
+    url: $CI_REPOSITORY_URL
+  
   script:
     - ./gradlew publish --no-daemon
-
