@@ -121,7 +121,7 @@ jobs:
       image: eclipse-temurin:8u422-b05-jdk
 
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     needs:
@@ -185,6 +185,7 @@ jobs:
 
     permissions:
      contents: read
+     packages: write
      deployments: write
 
     needs:
