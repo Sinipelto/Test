@@ -36,6 +36,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: eclipse-temurin:8u422-b05-jdk
 
     permissions:
       contents: read
@@ -129,7 +130,7 @@ jobs:
         with:
           title: "Automatic Release ${{ env.VERSION }}"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ env.VERSION }}"
+          automatic_release_tag: ${{ env.VERSION }}
           draft: false
           prerelease: false
           files: |
