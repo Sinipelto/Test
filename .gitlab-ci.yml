@@ -49,25 +49,38 @@ test:
   script:
     - ./gradlew test --no-daemon
 
-release:
+release_pre:
   stage: release
   dependencies:
     - build
     - test
   script:
-    - git config user.name "DevOps User"
-    - git config user.email "devops@company.com"
     - chmod +x version.sh
     - VERSION_OLD=$(cat version)
     - VERSION=$(./version.sh $VERSION_OLD)
-    - echo "VERSION_OLD=$VERSION_OLD" >> ${GITHUB_ENV:build.env}
-    - echo "VERSION=$VERSION" >> ${GITHUB_ENV:build.env}
+    - echo "VERSION_OLD=$VERSION_OLD" >> ${GITHUB_ENV:-build.env}
+    - echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
     - echo $VERSION > version
-    - ./gradlew jar --no-daemon
-    - mv -v ${BUILD_DIR}/*.jar ${APP_NAME}_${VERSION}.jar
+    - git config user.name "DevOps User"
+    - git config user.email "devops@company.com"
     - git add version
     - git commit -m "[skip-ci] Automatic Bump Version from ${VERSION_OLD} to ${VERSION}."
     - git push
+  artifacts:
+    untracked: false
+    when: on_success
+    reports:
+      dotenv: build.env
+
+release:
+  stage: release
+  dependencies:
+    - build
+    - test
+    - release_pre
+  script:
+    - ./gradlew jar --no-daemon
+    - mv -v ${BUILD_DIR}/*.jar ${APP_NAME}_${VERSION}.jar
   release:
     # Description is REQUIRED
     description: "DESCRIPTION: Automatic Release ${VERSION}"
