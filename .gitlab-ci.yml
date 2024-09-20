@@ -26,6 +26,7 @@ default:
 stages:
   - build
   - test
+  - release_pre
   - release
   - deploy
 
@@ -50,7 +51,7 @@ test:
     - ./gradlew test --no-daemon
 
 release_pre:
-  stage: release
+  stage: release_pre
   dependencies:
     - build
     - test
