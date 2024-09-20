@@ -6,27 +6,31 @@
 # Note that environment variables can be set in several places
 # See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 
-image: eclipse-temurin:8u422-b05-jdk
+image:
+  name: eclipse-temurin:8u422-b05-jdk
+
+default:
+  interruptible: true
+  before_script:
+    - GRADLE_USER_HOME="$(pwd)/.gradle"
+    - export GRADLE_USER_HOME
+  cache:
+    untracked: false
+    when: on_success
+    paths:
+      - '**/*.gradle*'
+      - '**/gradle-wrapper.properties'
 
 stages:
-- build
-- test
-- release
-- deploy
+  - build
+  - test
+  - release
+  - deploy
 
 variables:
   APP_NAME: 'test-app'
   BUILD_DIR: 'client/build/libs'
   ENVIRONMENT: 'Production'
-
-before_script:
-  - GRADLE_USER_HOME="$(pwd)/.gradle"
-  - export GRADLE_USER_HOME
-
-cache:
-  paths:
-    - '**/*.gradle*'
-    - '**/gradle-wrapper.properties'
 
 build:
   stage: build
@@ -87,9 +91,9 @@ deploy:
     - release
   environment:
     name: Production
+    url: $CI_REPOSITORY_URL
     action: start
     deployment_tier: production
-    url: $CI_REPOSITORY_URL
   
   script:
     - ./gradlew publish --no-daemon
