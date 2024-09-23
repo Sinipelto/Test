@@ -1,10 +1,16 @@
-# Test Repo
+# CI/CD Test Repo
 
-GitHub:
-![Build, Release & Deploy](https://github.com/sinipelto/test/actions/workflows/build_release_deploy.yml/badge.svg)
+## Status
+
+###
+
+#### GitHub
+
+[![Build, Release & Deploy](https://github.com/sinipelto/test/actions/workflows/build_release_deploy.yml/badge.svg)](https://github.com/sinipelto/test/actions/workflows/build_release_deploy.yml)
 [![Latest Release](https://img.shields.io/github/v/release/sinipelto/test?logo=GitHub)](https://github.com/sinipelto/test/releases)
 
-GitLab:
+#### GitLab
+
 [![GitLab status](https://gitlab.com/Sinipelto/cicd-test/badges/main/pipeline.svg)](https://gitlab.com/Sinipelto/cicd-test/-/commits/main)
 [![Latest Release](https://gitlab.com/Sinipelto/cicd-test/-/badges/release.svg)](https://gitlab.com/Sinipelto/cicd-test/-/releases)
 
