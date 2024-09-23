@@ -240,4 +240,5 @@ jobs:
 
       # TODO: PUBLISH PACKAGE TO GITHUB PACKAGES
 
-      - run: ./gradlew publish --no-daemon
+      - run: |
+          ./gradlew publish --no-daemon
