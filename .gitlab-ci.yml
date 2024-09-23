@@ -52,6 +52,8 @@ test:
 
 release_pre:
   stage: release_pre
+  image:
+    name: gitlab-runner:alpine
   dependencies:
     - build
     - test
@@ -68,12 +70,12 @@ release_pre:
     - git commit -m "[skip-ci] Automatic Bump Version from ${VERSION_OLD} to ${VERSION}."
     - git push
   artifacts:
-    untracked: false
     when: on_success
+    untracked: false
     reports:
       dotenv: build.env
 
-release_post:
+release:
   stage: release
   dependencies:
     - build
@@ -87,6 +89,8 @@ release_post:
     description: "DESCRIPTION: Automatic Release ${VERSION}"
     name: "NAME: Automatic Release ${VERSION}"
     tag_name: ${VERSION}
+    ref: ${VERSION}
+    tag_message: "TAGMSG: A new release: ${VERSION}"
   artifacts:
     when: on_success
     untracked: false
@@ -103,7 +107,7 @@ deploy:
   dependencies:
     - build
     - test
-    - release_post # pre and post
+    - release # pre and post
   environment:
     name: Production
     url: $CI_REPOSITORY_URL
