@@ -136,6 +136,8 @@ release:
       - '**/*.txt'
       - 'version'
       - '.github/**'
+  image: 
+    name: registry.gitlab.com/gitlab-org/release-cli:latest
   dependencies:
     - build
     - test
@@ -150,7 +152,7 @@ release:
     description: "DESCRIPTION: Automatic Release ${VERSION}"
     name: "NAME: Automatic Release ${VERSION}"
     tag_name: ${VERSION}
-    ref: ${VERSION}
+#    ref: ${VERSION}
     tag_message: "TAGMSG: A new release: ${VERSION}"
   artifacts:
     when: on_success
