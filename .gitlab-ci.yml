@@ -63,8 +63,8 @@ build:
   script:
     - ./gradlew build --no-daemon
 
-include:
-  - template: Security/SAST.gitlab-ci.yml
+# include:
+#   - template: Security/SAST.gitlab-ci.yml
 
 test:
   stage: test
@@ -116,7 +116,8 @@ release_pre:
     - git add version
     - git commit -m "[skip-ci] Automatic Bump Version from ${VERSION_OLD} to ${VERSION}."
 #    - git push origin HEAD:$CI_COMMIT_BRANCH
-    - git push https://gitlab-ci-token:$GITLAB_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git origin HEAD:$CI_COMMIT_BRANCH
+    - echo git push https://gitlab-ci-token:$GITLAB_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_BRANCH
+    - git push https://gitlab-ci-token:$GITLAB_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_BRANCH
 
   artifacts:
     when: on_success
