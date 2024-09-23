@@ -101,8 +101,8 @@ release_pre:
     - echo "VERSION_OLD=$VERSION_OLD" >> ${GITHUB_ENV:-build.env}
     - echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
     - echo $VERSION > version
-    - git config user.name "DevOps User"
-    - git config user.email "devops@company.com"
+    - git config user.name "${GITLAB_USER_NAME}"
+    - git config user.email "${GITLAB_USER_EMAIL}"
     - git add version
     - git commit -m "[skip-ci] Automatic Bump Version from ${VERSION_OLD} to ${VERSION}."
     - git push origin HEAD:$CI_COMMIT_BRANCH
