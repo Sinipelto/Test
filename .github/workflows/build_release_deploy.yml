@@ -158,13 +158,11 @@ jobs:
             **/*.gradle*
             **/gradle-wrapper.properties
 
-      - run: |
-          VERSION=$(cat version)
-          echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
-
       # build and test jobs successfully run at this point
       # Safe to assume jar will pass OK 
       - run: |
+          VERSION=$(cat version)
+          echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
           ./gradlew jar --no-daemon
           mv -v ${{ env.BUILD_DIR }}/*.jar ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
 
@@ -229,12 +227,10 @@ jobs:
       - run: |
           VERSION=$(cat version)
           echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
+          ./gradlew publish --no-daemon
 
       - uses: actions/download-artifact@v4
         with:
           name: ${{ env.APP_NAME }}_${{ env.VERSION }}
 
       # TODO: PUBLISH PACKAGE TO GITHUB PACKAGES
-
-      - run: |
-          ./gradlew publish --no-daemon
