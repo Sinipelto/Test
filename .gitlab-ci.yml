@@ -12,7 +12,6 @@ workflow:
     on_job_failure: all
     on_new_commit: interruptible
 
-
 # using defaults for every job is preferred
 # instead of using globals, if keyword supported
 default:
@@ -107,6 +106,7 @@ release_pre:
     - echo "VERSION_OLD=$VERSION_OLD" >> ${GITHUB_ENV:-build.env}
     - echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
     - echo $VERSION > version
+    - git config --global --add safe.directory "$(pwd)"
     - git config user.name "DevOps User"
     - git config user.email "devops@company.com"
     # this is NOT required in GH - how to handle??
@@ -116,9 +116,8 @@ release_pre:
     - git add version
     - git commit -m "[skip-ci] Automatic Bump Version from ${VERSION_OLD} to ${VERSION}."
 #    - git push origin HEAD:$CI_COMMIT_BRANCH
-    - echo git push https://gitlab-ci-token:$GITLAB_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_BRANCH
-    - git push https://gitlab-ci-token:$GITLAB_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_BRANCH
-
+    - echo git push https://gitlab-ci-token:$CI_JOB_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_BRANCH
+    - git push https://gitlab-ci-token:$CI_JOB_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_BRANCH
   artifacts:
     when: on_success
     untracked: false
