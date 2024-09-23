@@ -124,6 +124,7 @@ jobs:
           echo "VERSION_OLD=$VERSION_OLD" >> ${GITHUB_ENV:-build.env}
           echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
           echo $VERSION > version
+          git config --global --add safe.directory "$(pwd)"
           git config user.name "DevOps User"
           git config user.email "devops@company.com"
           git add version
