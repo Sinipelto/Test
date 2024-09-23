@@ -17,15 +17,14 @@ name: Test CI Pipeline for Build and Release and Deploy
 
 on:
   push:
+    branches:
+      - master
+      - release
     paths-ignore:
       - '**/*.md'
       - '**/*.txt'
       - 'version'
-      - 'version.sh'
       - '.gitlab-ci.yml'
-    branches:
-      - master
-      - release
 
 env:
   # VERSION FROM FILE
@@ -35,12 +34,14 @@ env:
 
 jobs:
   build:
+    # runs-on is required even though using container!
     runs-on: ubuntu-latest
     # GH WF does support only defaults: run: currently,
     # so container: image: has to be specified separately each job
     container:
       image: eclipse-temurin:8u422-b05-jdk
 
+    # TODO: How to consolidate perms in GL?
     permissions:
       contents: read
 
@@ -90,6 +91,10 @@ jobs:
   release_pre:
     runs-on: ubuntu-latest
 
+    # TODO: specify git container here
+    container:
+      image: bitnami/git:latest
+
     permissions:
       contents: write
 
@@ -102,6 +107,14 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
+      # Not needed here but added for simplicity
+      - uses: actions/cache@v4
+        with:
+          key: ${{ github.workflow }}
+          path: |
+            **/*.gradle*
+            **/gradle-wrapper.properties
+
       - run: |
           chmod +x version.sh
           VERSION_OLD=$(cat version)
@@ -113,7 +126,7 @@ jobs:
           git config user.email "devops@company.com"
           git add version
           git commit -m "[skip-ci] Automatic Bump Version from ${VERSION_OLD} to ${VERSION}."
-          git push
+          git push origin HEAD:${{ github.ref }}
 
   release:
     runs-on: ubuntu-latest
