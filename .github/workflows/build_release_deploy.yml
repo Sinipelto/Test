@@ -58,7 +58,6 @@ jobs:
             **/gradle-wrapper.properties
 
       - run: |
-          echo ${{ github.run_id }}
           ./gradlew build --no-daemon
 
   test:
@@ -89,7 +88,6 @@ jobs:
           type: java,bash,json,credscan,depscan
 
       - run: |
-          echo ${{ github.run_id }}
           ./gradlew test --no-daemon
 
   release_pre:
@@ -120,8 +118,6 @@ jobs:
             **/gradle-wrapper.properties
 
       - run: |
-          set -x
-          echo ${{ github.run_id }}
           chmod +x version.sh
           VERSION_OLD=$(cat version)
           VERSION=$(./version.sh $VERSION_OLD)
