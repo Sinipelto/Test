@@ -52,12 +52,14 @@ jobs:
 
       - uses: actions/cache@v4
         with:
-          key: ${{ github.workflow }}
+          key: ${{ github.run_id }}
           path: |
             **/*.gradle*
             **/gradle-wrapper.properties
 
-      - run: ./gradlew build --no-daemon
+      - run: |
+          echo ${{ github.run_id }}
+          ./gradlew build --no-daemon
 
   test:
     runs-on: ubuntu-latest
@@ -77,7 +79,7 @@ jobs:
 
       - uses: actions/cache@v4
         with:
-          key: ${{ github.workflow }}
+          key: ${{ github.run_id }}
           path: |
             '**/*.gradle*'
             '**/gradle-wrapper.properties'
@@ -86,7 +88,9 @@ jobs:
         with:
           type: java,bash,json,credscan,depscan
 
-      - run: ./gradlew test --no-daemon
+      - run: |
+          echo ${{ github.run_id }}
+          ./gradlew test --no-daemon
 
   release_pre:
     runs-on: ubuntu-latest
@@ -110,12 +114,14 @@ jobs:
       # Not needed here but added for simplicity
       - uses: actions/cache@v4
         with:
-          key: ${{ github.workflow }}
+          key: ${{ github.run_id }}
           path: |
             **/*.gradle*
             **/gradle-wrapper.properties
 
       - run: |
+          set -x
+          echo ${{ github.run_id }}
           chmod +x version.sh
           VERSION_OLD=$(cat version)
           VERSION=$(./version.sh $VERSION_OLD)
@@ -126,7 +132,7 @@ jobs:
           git config user.email "devops@company.com"
           git add version
           git commit -m "[skip-ci] Automatic Bump Version from ${VERSION_OLD} to ${VERSION}."
-          git push origin HEAD:${{ github.ref }}
+          git push origin HEAD:${{ github.ref_name }}
 
   release:
     runs-on: ubuntu-latest
@@ -151,7 +157,7 @@ jobs:
 
       - uses: actions/cache@v4
         with:
-          key: ${{ github.workflow }}
+          key: ${{ github.run_id }}
           path: |
             **/*.gradle*
             **/gradle-wrapper.properties
@@ -219,7 +225,7 @@ jobs:
 
       - uses: actions/cache@v4
         with:
-          key: ${{ github.workflow }}
+          key: ${{ github.run_id }}
           path: |
             '**/*.gradle*'
             '**/gradle-wrapper.properties'
