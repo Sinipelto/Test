@@ -143,8 +143,11 @@ release:
     - test
     - release_pre
   script:
-    - VERSION=$(cat version)
-    - echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
+    # FETCHING WRONG VERSION BECAUSE USING OLDER REF AS GIT CHECKOUT POINT
+    # TODO: HOW TO CHOOSE WHICH REF TO CHECKOUT BEFORE SCRIPT???
+    # DEFAULTS: BEFORE_SCRIPT: NO GIT AVAILABLE IN ALL IMAGES SO CANT USE THAT
+    # - VERSION=$(cat version)
+    # - echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
     - ./gradlew jar --no-daemon
     - mv -v ${BUILD_DIR}/*.jar ${APP_NAME}_${VERSION}.jar
   release:
@@ -152,7 +155,7 @@ release:
     description: "DESCRIPTION: Automatic Release ${VERSION}"
     name: "NAME: Automatic Release ${VERSION}"
     tag_name: ${VERSION}
-#    ref: ${VERSION}
+    ref: ${VERSION}
     tag_message: "TAGMSG: A new release: ${VERSION}"
   artifacts:
     when: on_success
