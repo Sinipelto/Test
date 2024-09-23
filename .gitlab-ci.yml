@@ -36,6 +36,7 @@ stages:
   - build
   - test
   - release_pre
+  - release_post
   - release
   - deploy
 
@@ -58,6 +59,8 @@ build:
       - '**/*.txt'
       - 'version'
       - '.github/**'
+  image:
+    name: eclipse-temurin:8u422-b05-jdk
   script:
     - ./gradlew build --no-daemon
 
@@ -78,6 +81,8 @@ test:
       - '.github/**'
   dependencies:
     - build
+  image:
+    name: eclipse-temurin:8u422-b05-jdk
   script:
     - ./gradlew test --no-daemon
 
@@ -123,12 +128,49 @@ release_pre:
     reports:
       dotenv: build.env
 
+release_post:
+  stage: release_post
+  only:
+    refs:
+      - master
+      - release
+  except:
+    changes:
+      - '**/*.md'
+      - '**/*.txt'
+      - 'version'
+      - '.github/**'
+  dependencies:
+    - build
+    - test
+    - release_pre
+  image:
+    name: eclipse-temurin:8u422-b05-jdk
+  script:
+    # FETCHING WRONG VERSION BECAUSE USING OLDER REF AS GIT CHECKOUT POINT
+    # TODO: HOW TO CHOOSE WHICH REF TO CHECKOUT BEFORE SCRIPT???
+    # DEFAULTS: BEFORE_SCRIPT: NO GIT AVAILABLE IN ALL IMAGES SO CANT USE THAT
+    # - VERSION=$(cat version)
+    # - echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
+    - ./gradlew jar --no-daemon
+    - mv -v ${BUILD_DIR}/*.jar ${APP_NAME}_${VERSION}.jar
+  artifacts:
+    when: on_success
+    untracked: false
+    name: ${APP_NAME}_${VERSION}
+    access: all
+    paths:
+      - version
+      - Readme.txt
+      - ${APP_NAME}_${VERSION}.jar
+    expire_in: "7 days"
+
 release:
   stage: release
   only:
     refs:
       - master
-      - release
+      - release_post
   except:
     changes:
       - '**/*.md'
@@ -156,16 +198,6 @@ release:
     tag_name: ${VERSION}
     ref: ${VERSION}
     tag_message: "TAGMSG: A new release: ${VERSION}"
-  artifacts:
-    when: on_success
-    untracked: false
-    name: ${APP_NAME}_${VERSION}
-    access: all
-    paths:
-      - version
-      - Readme.txt
-      - ${APP_NAME}_${VERSION}.jar
-    expire_in: "7 days"
 
 deploy:
   stage: deploy
@@ -183,6 +215,8 @@ deploy:
     - build
     - test
     - release # pre and post
+  image:
+    name: eclipse-temurin:8u422-b05-jdk
   script:
     - VERSION=$(cat version)
     - echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
