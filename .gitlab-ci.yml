@@ -53,7 +53,7 @@ test:
 release_pre:
   stage: release_pre
   image:
-    name: gitlab-runner:alpine
+    name: bitnami/git:latest
   dependencies:
     - build
     - test
