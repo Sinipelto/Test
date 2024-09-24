@@ -116,7 +116,7 @@ release_pre:
     - git config user.name "DevOps User"
     - git config user.email "devops@company.com"
     - git add version
-    - git commit -m "[skip-ci] Automatic Bump Version from ${VERSION_OLD} to ${VERSION}."
+    - git commit -m "[skip-ci] Automatic Bump Version from v${VERSION_OLD} to v${VERSION}."
     - chmod +x push.sh
     - ./push.sh $CI_SERVER_HOST $CI_COMMIT_BRANCH
   artifacts:
@@ -151,16 +151,16 @@ release_post:
     # - echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
     # - VERSION=$VERSION
     - ./gradlew jar --no-daemon
-    - mv -v ${BUILD_DIR}/*.jar ./${APP_NAME}_${VERSION}.jar
+    - mv -v ${BUILD_DIR}/*.jar ./${APP_NAME}_v${VERSION}.jar
   artifacts:
     when: on_success
     untracked: false
-    name: ${APP_NAME}_${VERSION}
+    name: ${APP_NAME}_v${VERSION}
     access: all
     paths:
       - version
       - Readme.txt
-      - ${APP_NAME}_${VERSION}.jar
+      - ${APP_NAME}_v${VERSION}.jar
     expire_in: "7 days"
 
 release:
