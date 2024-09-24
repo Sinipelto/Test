@@ -13,6 +13,9 @@
 # About setting up gradle
 # https://github.com/gradle/actions/blob/main/setup-gradle/README.md
 
+# REPOSITORY
+# https://github.com/sinipelto/test
+
 name: Test CI Pipeline for Build and Release and Deploy
 
 on:

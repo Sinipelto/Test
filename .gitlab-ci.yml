@@ -6,6 +6,9 @@
 # Note that environment variables can be set in several places
 # See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 
+# REPOSITORY
+# https://gitlab.com/Sinipelto/cicd-test
+
 workflow:
   name: CICD Pipeline to Build, Test, Release and Deploy
 
