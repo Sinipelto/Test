@@ -177,11 +177,9 @@ release:
   dependencies:
     - build
     - test
+    - release_pre
     - release_post
-  script: 
-    # TODO GH!!
-    - echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
-    - VERSION=$VERSION
+  script: echo "Unnecessary echo due to required script field in release job"
   release:
     # Description is REQUIRED field TODO: how differs from 'name'?
     description: "DESCRIPTION: Automatic Release ${VERSION}"
@@ -205,13 +203,12 @@ deploy:
   dependencies:
     - build
     - test
-    - release # pre and post
+    - release_pre
+    - release_post
+    - release
   image:
     name: eclipse-temurin:8u422-b05-jdk
   script:
-    # TODO GH!! cat version but git checkout latest ref
-    - echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
-    - VERSION=$VERSION
     - ./gradlew publish --no-daemon
   environment:
     name: Production
