@@ -8,8 +8,6 @@
 
 workflow:
   name: CICD Pipeline to Build, Test, Release and Deploy
-  auto_cancel:
-    on_job_failure: all
 
 # using defaults for every job is preferred
 # instead of using globals, if keyword supported
