@@ -128,8 +128,9 @@ jobs:
           git config user.name "DevOps User"
           git config user.email "devops@company.com"
           git add version
-          git commit -m "[skip-ci] Automatic Bump Version from ${VERSION_OLD} to ${VERSION}."
-          git push origin HEAD:${{ github.ref_name }}
+          git commit -m "[skip-ci] Automatic Bump Version from v${VERSION_OLD} to v${VERSION}."
+          chmod +x push.sh
+          ./push.sh $GITHUB_SERVER_URL $GITHUB_REF_NAME
 
   release_post:
     runs-on: ubuntu-latest
@@ -164,11 +165,11 @@ jobs:
           VERSION=$(cat version)
           echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
           ./gradlew jar --no-daemon
-          mv -v ${{ env.BUILD_DIR }}/*.jar ${{ env.APP_NAME }}_${VERSION}.jar
+          mv -v ${BUILD_DIR}/*.jar ${APP_NAME}_v${VERSION}.jar
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}_${{ env.VERSION }}
+          name: ${{ env.APP_NAME }}_v${{ env.VERSION }}
           if-no-files-found: error
           retention-days: 7
           compression-level: 0
@@ -177,7 +178,7 @@ jobs:
           path: |
             version
             Readme.txt
-            ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
+            ${{ env.APP_NAME }}_v${{ env.VERSION }}.jar
 
   release:
     runs-on: ubuntu-latest
@@ -213,19 +214,19 @@ jobs:
       # Compare GL: dependecies: job or needs: job: artifacts: true
       - uses: actions/download-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}_${{ env.VERSION }}
+          name: ${{ env.APP_NAME }}_v${{ env.VERSION }}
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          title: "Automatic Release ${{ env.VERSION }}"
+          title: "Automatic Release v${{ env.VERSION }}"
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: ${{ env.VERSION }}
+          automatic_release_tag: v${{ env.VERSION }}
           draft: false
           prerelease: false
           files: |
             version
             Readme.txt
-            ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
+            ${{ env.APP_NAME }}_v${{ env.VERSION }}.jar
 
   deploy:
     runs-on: ubuntu-latest
@@ -269,6 +270,6 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}_${{ env.VERSION }}
+          name: ${{ env.APP_NAME }}_v${{ env.VERSION }}
 
       # TODO: PUBLISH PACKAGE TO GITHUB PACKAGES

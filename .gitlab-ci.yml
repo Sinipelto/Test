@@ -117,8 +117,8 @@ release_pre:
     - git config user.email "devops@company.com"
     - git add version
     - git commit -m "[skip-ci] Automatic Bump Version from ${VERSION_OLD} to ${VERSION}."
-    # NOTE!!!! Differs from GH! How to handle?
-    - git push https://gitlab-ci-token:$CI_ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_BRANCH
+    - chmod +x push.sh
+    - ./push.sh $CI_SERVER_HOST $CI_COMMIT_BRANCH
   artifacts:
     when: on_success
     untracked: false
@@ -185,10 +185,10 @@ release:
   script: echo "Unnecessary echo due to required script field in release job"
   release:
     # Description is REQUIRED field TODO: how differs from 'name'?
-    name: "NAME: Automatic Release ${VERSION}"
-    description: "DESCRIPTION: Automatic Release ${VERSION}"
-    tag_name: ${VERSION}
-    tag_message: "TAGMSG: A new release: ${VERSION}"
+    name: "Automatic Release v${VERSION}"
+    description: "Automatic Release v${VERSION}"
+    tag_name: v${VERSION}
+    tag_message: "Release Tag: v${VERSION}"
     # Create tag to current ref/branch
     ref: $CI_COMMIT_BRANCH
 
