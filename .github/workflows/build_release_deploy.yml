@@ -46,6 +46,8 @@ jobs:
       contents: read
 
     steps:
+      # NOTE: There is no similar action in GL!
+      # TODO: How do we checkout to ref in GH???
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
@@ -109,13 +111,8 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      # Not needed here but added for simplicity
-      - uses: actions/cache@v4
-        with:
-          key: ${{ github.run_id }}
-          path: |
-            **/*.gradle*
-            **/gradle-wrapper.properties
+      # Cache is not needed here
+      # Consolidate by including each step cache
 
       - run: |
           chmod +x version.sh
@@ -131,14 +128,13 @@ jobs:
           git commit -m "[skip-ci] Automatic Bump Version from ${VERSION_OLD} to ${VERSION}."
           git push origin HEAD:${{ github.ref_name }}
 
-  release:
+  release_post:
     runs-on: ubuntu-latest
     container:
       image: eclipse-temurin:8u422-b05-jdk
 
     permissions:
       contents: write
-      packages: write
 
     needs:
       - build
@@ -165,19 +161,7 @@ jobs:
           VERSION=$(cat version)
           echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
           ./gradlew jar --no-daemon
-          mv -v ${{ env.BUILD_DIR }}/*.jar ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
-
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          title: "Automatic Release ${{ env.VERSION }}"
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: ${{ env.VERSION }}
-          draft: false
-          prerelease: false
-          files: |
-            version
-            Readme.txt
-            ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
+          mv -v ${{ env.BUILD_DIR }}/*.jar ./${{ env.APP_NAME }}_${{ env.VERSION }}.jar
 
       - uses: actions/upload-artifact@v4
         with:
@@ -192,15 +176,58 @@ jobs:
             Readme.txt
             ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
 
+  release:
+    runs-on: ubuntu-latest
+    container:
+      image: eclipse-temurin:8u422-b05-jdk
+
+    permissions:
+      contents: write
+
+    needs:
+      - build
+      - test
+      - release_post
+
+    steps:
+      # NOTE: INSTALLS GIT IF MISSING IN THE CONTAINER IMAGE!!
+      # COMPARE GITLAB: HAS TO BE MANUALLY INSTALLED IN THE IMAGE
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      # Script is not needed here
+      # so no commands executed
+
+      # Cache is not needed here
+      # Consolidate by including each step cache
+
+      # Compare GL: dependecies: job or needs: job: artifacts: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}_${{ env.VERSION }}
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          title: "Automatic Release ${{ env.VERSION }}"
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: ${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            version
+            Readme.txt
+            ${{ env.APP_NAME }}_${{ env.VERSION }}.jar
+
   deploy:
     runs-on: ubuntu-latest
     container:
       image: eclipse-temurin:8u422-b05-jdk
 
     permissions:
-     contents: read
-     packages: write
-     deployments: write
+      contents: read
+      packages: write
+      deployments: write
 
     needs:
       - build
