@@ -146,6 +146,7 @@ release_post:
     # DEFAULTS: BEFORE_SCRIPT: NO GIT AVAILABLE IN ALL IMAGES SO CANT USE THAT
     # - VERSION=$(cat version)
     # - echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
+    # - VERSION=$VERSION
     - ./gradlew jar --no-daemon
     - mv -v ${BUILD_DIR}/*.jar ./${APP_NAME}_${VERSION}.jar
   artifacts:
@@ -177,7 +178,10 @@ release:
     - build
     - test
     - release_post
-  script: echo "Unnecessary echo for required script block of the release job"
+  script: 
+    # TODO GH!!
+    - echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
+    - VERSION=$VERSION
   release:
     # Description is REQUIRED field TODO: how differs from 'name'?
     description: "DESCRIPTION: Automatic Release ${VERSION}"
@@ -205,8 +209,9 @@ deploy:
   image:
     name: eclipse-temurin:8u422-b05-jdk
   script:
-    - VERSION=$(cat version)
+    # TODO GH!! cat version but git checkout latest ref
     - echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
+    - VERSION=$VERSION
     - ./gradlew publish --no-daemon
   environment:
     name: Production

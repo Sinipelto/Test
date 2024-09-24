@@ -160,6 +160,7 @@ jobs:
       - run: |
           VERSION=$(cat version)
           echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
+          VERSION=$VERSION
           ./gradlew jar --no-daemon
           mv -v ${{ env.BUILD_DIR }}/*.jar ./${{ env.APP_NAME }}_${{ env.VERSION }}.jar
 
@@ -201,6 +202,11 @@ jobs:
 
       # Cache is not needed here
       # Consolidate by including each step cache
+
+      - run: |
+          VERSION=$(cat version)
+          echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
+          VERSION=$VERSION
 
       # Compare GL: dependecies: job or needs: job: artifacts: true
       - uses: actions/download-artifact@v4
@@ -255,6 +261,7 @@ jobs:
       - run: |
           VERSION=$(cat version)
           echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
+          VERSION=$VERSION
           ./gradlew publish --no-daemon
 
       - uses: actions/download-artifact@v4
