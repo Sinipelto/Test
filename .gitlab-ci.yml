@@ -177,6 +177,7 @@ release:
     - build
     - test
     - release_post
+  script: echo "Unnecessary echo for required script block of the release job"
   release:
     # Description is REQUIRED field TODO: how differs from 'name'?
     description: "DESCRIPTION: Automatic Release ${VERSION}"
