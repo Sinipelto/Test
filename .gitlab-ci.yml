@@ -182,11 +182,12 @@ release:
   script: echo "Unnecessary echo due to required script field in release job"
   release:
     # Description is REQUIRED field TODO: how differs from 'name'?
-    description: "DESCRIPTION: Automatic Release ${VERSION}"
     name: "NAME: Automatic Release ${VERSION}"
+    description: "DESCRIPTION: Automatic Release ${VERSION}"
     tag_name: ${VERSION}
-    ref: ${VERSION}
     tag_message: "TAGMSG: A new release: ${VERSION}"
+    # Create tag to current ref/branch
+    ref: $CI_COMMIT_BRANCH
 
 deploy:
   stage: deploy
