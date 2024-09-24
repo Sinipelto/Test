@@ -160,9 +160,8 @@ jobs:
       - run: |
           VERSION=$(cat version)
           echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
-          VERSION=$VERSION
           ./gradlew jar --no-daemon
-          mv -v ${{ env.BUILD_DIR }}/*.jar ./${{ env.APP_NAME }}_${{ env.VERSION }}.jar
+          mv -v ${{ env.BUILD_DIR }}/*.jar ${{ env.APP_NAME }}_${VERSION}.jar
 
       - uses: actions/upload-artifact@v4
         with:
@@ -188,6 +187,7 @@ jobs:
     needs:
       - build
       - test
+      - release_pre
       - release_post
 
     steps:
@@ -206,7 +206,6 @@ jobs:
       - run: |
           VERSION=$(cat version)
           echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
-          VERSION=$VERSION
 
       # Compare GL: dependecies: job or needs: job: artifacts: true
       - uses: actions/download-artifact@v4
@@ -238,6 +237,8 @@ jobs:
     needs:
       - build
       - test
+      - release_pre
+      - release_post
       - release
 
     # Publish to production environment
@@ -261,7 +262,6 @@ jobs:
       - run: |
           VERSION=$(cat version)
           echo "VERSION=$VERSION" >> ${GITHUB_ENV:-build.env}
-          VERSION=$VERSION
           ./gradlew publish --no-daemon
 
       - uses: actions/download-artifact@v4
