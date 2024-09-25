@@ -26,10 +26,6 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-# GitHub recommends pinning actions to a commit SHA.
-# To get a newer version, you will need to update the SHA.
-# You can also reference a tag or branch, but the action may change without warning.
-
 # https://docs.github.com/en/actions/use-cases-and-examples/publishing-packages/publishing-java-packages-with-gradle
 # https://github.com/actions/upload-artifact
 
