@@ -82,7 +82,6 @@ build:
       - '**/*.md'
       - '**/*.txt'
       - 'version'
-      - '.github/**'
   image:
     name: eclipse-temurin:8u422-b05-jdk
   script:
@@ -102,7 +101,6 @@ test:
       - '**/*.md'
       - '**/*.txt'
       - 'version'
-      - '.github/**'
   dependencies:
     - build
   image:
@@ -121,7 +119,6 @@ release_pre:
       - '**/*.md'
       - '**/*.txt'
       - 'version'
-      - '.github/**'
   image:
     name: bitnami/git:latest
   dependencies:
@@ -159,7 +156,6 @@ release_post:
       - '**/*.md'
       - '**/*.txt'
       - 'version'
-      - '.github/**'
   dependencies:
     - build
     - test
@@ -197,7 +193,6 @@ release:
       - '**/*.md'
       - '**/*.txt'
       - 'version'
-      - '.github/**'
   image: 
     name: registry.gitlab.com/gitlab-org/release-cli:latest
   dependencies:
@@ -226,7 +221,6 @@ deploy:
       - '**/*.md'
       - '**/*.txt'
       - 'version'
-      - '.github/**'
   dependencies:
     - build
     - test

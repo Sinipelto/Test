@@ -50,7 +50,6 @@ on:
       - '**/*.md'
       - '**/*.txt'
       - 'version'
-      - '.gitlab-ci.yml'
 
 env:
   # VERSION FROM FILE
