@@ -136,7 +136,7 @@ release_pre:
     - git config user.name "DevOps User"
     - git config user.email "devops@company.com"
     - git add version
-    - git commit -m "[skip-ci] Automatic Bump Version from v${VERSION_OLD} to v${VERSION}."
+    - git commit -m "[skip ci] Automatic Bump Version from v${VERSION_OLD} to v${VERSION}."
     - chmod +x push.sh
     - ./push.sh $CI_SERVER_HOST $CI_COMMIT_BRANCH
   artifacts:
